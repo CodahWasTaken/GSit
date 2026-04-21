@@ -54,6 +54,9 @@ Options:
     # Maximum distance from the block to allow sitting by clicking (0 = unlimited)
     max-distance: 0.0
 
+    # Cooldown in seconds between right-click sits (0 means no cooldown)
+    click-cooldown: 0.0
+
     # Allow sitting by default without using 'sit toggle'
     default-sit-mode: true
 

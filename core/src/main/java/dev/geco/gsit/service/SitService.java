@@ -156,12 +156,16 @@ public class SitService {
     }
 
     public void handleSafeSeatDismount(Seat seat) {
+        double sitBlockDataHeightOffset = getSitBlockDataHeightOffset(seat.getBlock().getBlockData());
+        Location upLocation = seat.getLocation().add(0d, baseOffset + (Tag.STAIRS.isTagged(seat.getBlock().getType()) ? STAIR_Y_OFFSET : 0d) - sitBlockDataHeightOffset, 0d);
+
+        // Fall back to the safe up-location if the saved return spot is now obstructed (block clipping fix).
         Location returnLocation;
-        if(gSitMain.getConfigService().GET_UP_RETURN) returnLocation = seat.getReturnLocation();
-        else {
-            double sitBlockDataHeightOffset = getSitBlockDataHeightOffset(seat.getBlock().getBlockData());
-            returnLocation = seat.getLocation().add(0d, baseOffset + (Tag.STAIRS.isTagged(seat.getBlock().getType()) ? STAIR_Y_OFFSET : 0d) - sitBlockDataHeightOffset, 0d);
-        }
+        if(gSitMain.getConfigService().GET_UP_RETURN) {
+            Location savedReturn = seat.getReturnLocation();
+            boolean returnIsSafe = savedReturn.getBlock().isPassable() && savedReturn.clone().add(0, 1, 0).getBlock().isPassable();
+            returnLocation = returnIsSafe ? savedReturn : upLocation;
+        } else returnLocation = upLocation;
 
         Entity entity = seat.getEntity();
         Location entityLocation = entity.getLocation();

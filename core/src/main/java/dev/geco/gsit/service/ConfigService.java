@@ -37,6 +37,7 @@ public class ConfigService {
     public boolean S_BOTTOM_PART_ONLY;
     public boolean S_EMPTY_HAND_ONLY;
     public double S_MAX_DISTANCE;
+    public double S_CLICK_COOLDOWN;
     public boolean S_DEFAULT_SIT_MODE;
     public boolean PS_ALLOW_SIT;
     public boolean PS_ALLOW_SIT_NPC;
@@ -110,6 +111,7 @@ public class ConfigService {
         S_BOTTOM_PART_ONLY = gSitMain.getConfig().getBoolean("Options.Sit.bottom-part-only", true);
         S_EMPTY_HAND_ONLY = gSitMain.getConfig().getBoolean("Options.Sit.empty-hand-only", true);
         S_MAX_DISTANCE = gSitMain.getConfig().getDouble("Options.Sit.max-distance", 0d);
+        S_CLICK_COOLDOWN = gSitMain.getConfig().getDouble("Options.Sit.click-cooldown", 0d);
         S_DEFAULT_SIT_MODE = gSitMain.getConfig().getBoolean("Options.Sit.default-sit-mode", true);
 
         PS_ALLOW_SIT = gSitMain.getConfig().getBoolean("Options.PlayerSit.allow-sit", true);

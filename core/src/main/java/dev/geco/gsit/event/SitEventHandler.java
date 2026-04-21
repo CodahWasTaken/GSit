@@ -18,14 +18,20 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class SitEventHandler implements Listener {
 
     private final GSitMain gSitMain;
     private final Attribute blockInteractionRangeAttribute;
+    private final Map<UUID, Long> clickCooldowns = new HashMap<>();
 
     public SitEventHandler(GSitMain gSitMain) {
         this.gSitMain = gSitMain;
@@ -72,6 +78,14 @@ public class SitEventHandler implements Listener {
 
         if(!gSitMain.getConfigService().SAME_BLOCK_REST && !gSitMain.getSitService().kickSeatEntitiesFromBlock(clickedBlock, player)) return;
 
+        double cooldownSeconds = gSitMain.getConfigService().S_CLICK_COOLDOWN;
+        if(cooldownSeconds > 0d) {
+            long now = System.currentTimeMillis();
+            Long last = clickCooldowns.get(player.getUniqueId());
+            if(last != null && now - last < (long) (cooldownSeconds * 1000d)) return;
+            clickCooldowns.put(player.getUniqueId(), now);
+        }
+
         if(Tag.STAIRS.isTagged(clickedBlock.getType())) {
 
             if(((Stairs) blockData).getHalf() == Bisected.Half.BOTTOM) {
@@ -115,6 +129,11 @@ public class SitEventHandler implements Listener {
         }
 
         if(gSitMain.getSitService().createSeat(clickedBlock, player, true, useCenter ? xoffset : 0d, 0d, useCenter ? zoffset : 0, player.getLocation().getYaw(), true) != null) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void playerQuitEvent(PlayerQuitEvent event) {
+        clickCooldowns.remove(event.getPlayer().getUniqueId());
     }
 
 }
